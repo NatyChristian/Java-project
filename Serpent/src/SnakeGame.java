@@ -238,13 +238,14 @@ class SnakeGame extends World{
 	public World onTick(){
 		if (this.dir == "D") {
 			if (this.snake.moveDown().getFirst().sameCord(this.fruit)) {
+				this.score = this.score + 1;
 				return new SnakeGame(
 					new ConsLoPoSnake(
 						new PieceOfSnake(this.fruit.x, this.fruit.y), 
 						this.snake),
 						"D",
 						this.fruit.Gen(),
-						this.score + 1
+						this.score
 				);
 			} else {
 				return new SnakeGame(this.snake.moveDown(), "D", this.fruit, this.score);
@@ -258,10 +259,10 @@ class SnakeGame extends World{
 						this.snake),
 						"U",
 						this.fruit.Gen(),
-						this.score + 1
+						this.score
 				);
 			} else {
-				return new SnakeGame(this.snake.moveUp(), "U", this.fruit, this.score + 1);
+				return new SnakeGame(this.snake.moveUp(), "U", this.fruit, this.score);
 			}
 		} else if (this.dir == "L") {
 			if (this.snake.moveLeft().getFirst().sameCord(this.fruit)) {
@@ -272,7 +273,7 @@ class SnakeGame extends World{
 						this.snake),
 						"L",
 						this.fruit.Gen(),
-						this.score + 1
+						this.score
 				);
 			} else {
 				return new SnakeGame(this.snake.moveLeft(), "L", this.fruit, this.score);
@@ -286,7 +287,7 @@ class SnakeGame extends World{
 						this.snake),
 						"R",
 						this.fruit.Gen(),
-						this.score + 1
+						this.score
 				);
 			} else {
 				return new SnakeGame(this.snake.moveRight(), "R", this.fruit, this.score);
@@ -302,7 +303,6 @@ class SnakeGame extends World{
 				if (!(this.snake.moveUp().getFirst().sameCord(fruit))) {
 					return new SnakeGame(this.snake.moveUp(), "U", this.fruit, this.score);
 				} else {
-					this.score = this.score + 1;
 					return new SnakeGame(
 					new ConsLoPoSnake(
 						new PieceOfSnake(this.fruit.x, this.fruit.y), 
@@ -320,7 +320,6 @@ class SnakeGame extends World{
 				if (!(this.snake.moveDown().getFirst().sameCord(fruit))) {
 					return new SnakeGame(this.snake.moveDown(), "D", this.fruit, this.score);
 				} else {
-					this.score = this.score + 1;
 					return new SnakeGame(
 					new ConsLoPoSnake(
 						new PieceOfSnake(this.fruit.x, this.fruit.y), 
@@ -338,7 +337,6 @@ class SnakeGame extends World{
 				if (!(this.snake.moveLeft().getFirst().sameCord(fruit))) {
 					return new SnakeGame(this.snake.moveLeft(), "L", this.fruit, this.score);
 				} else {
-					this.score = this.score + 1;
 					return new SnakeGame(
 					new ConsLoPoSnake(
 						new PieceOfSnake(this.fruit.x, this.fruit.y), 
@@ -356,7 +354,6 @@ class SnakeGame extends World{
 				if (!(this.snake.moveRight()).getFirst().sameCord(fruit)) {
 					return new SnakeGame(this.snake.moveRight(), "R", this.fruit, this.score);
 				} else {
-					this.score = this.score + 1;
 					return new SnakeGame(
 					new ConsLoPoSnake(
 						new PieceOfSnake(this.fruit.x, this.fruit.y), 
