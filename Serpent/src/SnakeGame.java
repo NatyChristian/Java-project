@@ -380,7 +380,7 @@ class SnakeGame extends World{
 	}
 	public static void main(String[] args){
 		Tester.runReport(new Examples(), false, false);
-		SnakeGame game = new SnakeGame((new Examples()).l5, "D", new Fruit(30, 30), 0);
+		SnakeGame game = new SnakeGame((new Examples()).l1, "R", new Fruit(30, 30), 0);
 		game.bigBang(game.WIDTH, game.HEIGHT, 0.1);
 	}
 }
