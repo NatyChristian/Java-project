@@ -1,0 +1,10 @@
+{
+    "java.project.sourcePaths": ["src"],
+    "java.project.outputPath": "bin",
+    "java.project.referencedLibraries": [
+		"lib/**/*.jar",
+		"/home/christian/Java-project/EclipseJars/javalib.jar",
+		"/home/christian/Java-project/EclipseJars/tester.jar"
+	],
+	"java.debug.settings.onBuildFailureProceed": true
+}
