@@ -1,7 +1,30 @@
+import java.util.Random;
 import tester.Tester;
 import java.awt.Color;
 import javalib.funworld.*;
 import javalib.worldimages.*;
+
+class Fruit {
+	int x, y;
+
+	Fruit(int x, int y){
+		this.x = x;
+		this.y = y;
+	}
+
+	Fruit Gen(){
+		Random rand = new Random();
+		return new Fruit(rand.nextInt(45) + 1,rand.nextInt(45) + 1);
+	}
+
+	WorldScene drawOn(WorldScene scene){
+		return scene.placeImageXY(
+			new RectangleImage(32, 32, OutlineMode.SOLID, Color.RED),
+			32 * ( this.x + 1/2) ,
+			32 * ( this.y + 1/2)
+		);
+	}
+}
 
 class PieceOfSnake{
 	int x, y;
@@ -30,6 +53,11 @@ class PieceOfSnake{
 			this.PX * ( this.y + 1/2)
 		);
 	}
+
+	boolean sameCord(Fruit fruit){
+		return 	(Math.abs(this.x - fruit.x) * 32 <= 2) &&
+				(Math.abs(this.y - fruit.y) * 32 <= 2);
+	}
 }
 
 interface ILoPoSnake{
@@ -40,7 +68,7 @@ interface ILoPoSnake{
 	ILoPoSnake dropEnd();
 	boolean isEmpty();
 	WorldScene drawOn(WorldScene scene);
-
+	PieceOfSnake getFirst();
 }
 
 class MtLoPoSnake implements ILoPoSnake{
@@ -65,6 +93,9 @@ class MtLoPoSnake implements ILoPoSnake{
 	}
 	public WorldScene drawOn(WorldScene scene){
 		return scene;
+	}
+	public PieceOfSnake getFirst(){
+		return new PieceOfSnake(-100, -100);
 	}
 }
 
@@ -100,6 +131,9 @@ class ConsLoPoSnake implements ILoPoSnake{
 	}
 	public WorldScene drawOn(WorldScene scene){
 		return this.rest.drawOn(this.first.drawOn(scene));
+	}
+	public PieceOfSnake getFirst(){
+		return this.first;
 	}
 }
 
@@ -190,48 +224,166 @@ class SnakeGame extends World{
 	int HEIGHT = (new PieceOfSnake(0, 0)).PX * 50;
 	ILoPoSnake snake;
 	String dir;
+	Fruit fruit;
+	int score;
 
-	SnakeGame(ILoPoSnake snake, String dir){
+	SnakeGame(ILoPoSnake snake, String dir, Fruit fruit, int score){
 		super();
 		this.snake = snake;
-		this.dir =  dir; 
+		this.dir =  dir;
+		this.fruit = fruit;
+		this.score = score;
 	}
 
 	public World onTick(){
 		if (this.dir == "D") {
-			return new SnakeGame(this.snake.moveDown(),"D");
+			if (this.snake.moveDown().getFirst().sameCord(this.fruit)) {
+				return new SnakeGame(
+					new ConsLoPoSnake(
+						new PieceOfSnake(this.fruit.x, this.fruit.y), 
+						this.snake),
+						"D",
+						this.fruit.Gen(),
+						this.score + 1
+				);
+			} else {
+				return new SnakeGame(this.snake.moveDown(), "D", this.fruit, this.score);
+			}
 		} else if (this.dir == "U") {
-			return new SnakeGame(this.snake.moveUp(), "U");
+			if (this.snake.moveUp().getFirst().sameCord(this.fruit)) {
+				this.score = this.score + 1;
+				return new SnakeGame(
+					new ConsLoPoSnake(
+						new PieceOfSnake(this.fruit.x, this.fruit.y), 
+						this.snake),
+						"U",
+						this.fruit.Gen(),
+						this.score + 1
+				);
+			} else {
+				return new SnakeGame(this.snake.moveUp(), "U", this.fruit, this.score + 1);
+			}
 		} else if (this.dir == "L") {
-			return new SnakeGame(this.snake.moveLeft(), "L");
+			if (this.snake.moveLeft().getFirst().sameCord(this.fruit)) {
+				this.score = this.score + 1;
+				return new SnakeGame(
+					new ConsLoPoSnake(
+						new PieceOfSnake(this.fruit.x, this.fruit.y), 
+						this.snake),
+						"L",
+						this.fruit.Gen(),
+						this.score + 1
+				);
+			} else {
+				return new SnakeGame(this.snake.moveLeft(), "L", this.fruit, this.score);
+			}
 		} else if (this.dir == "R") {
-			return new SnakeGame(this.snake.moveRight(), "R");
+			if (this.snake.moveRight().getFirst().sameCord(this.fruit)) {
+				this.score = this.score + 1;
+				return new SnakeGame(
+					new ConsLoPoSnake(
+						new PieceOfSnake(this.fruit.x, this.fruit.y), 
+						this.snake),
+						"R",
+						this.fruit.Gen(),
+						this.score + 1
+				);
+			} else {
+				return new SnakeGame(this.snake.moveRight(), "R", this.fruit, this.score);
+			}
 		} else {
 			return this;
 		}
 	}
 
 	public World onKeyEvent(String key){
-		if (key.equals("down")) {
-			return new SnakeGame(this.snake.moveDown(),"D");
-		} else if (key.equals("up")) {
-			return new SnakeGame(this.snake.moveUp(), "U");
+		if (key.equals("up")) {
+			if (this.dir != "D") {
+				if (!(this.snake.moveUp().getFirst().sameCord(fruit))) {
+					return new SnakeGame(this.snake.moveUp(), "U", this.fruit, this.score);
+				} else {
+					this.score = this.score + 1;
+					return new SnakeGame(
+					new ConsLoPoSnake(
+						new PieceOfSnake(this.fruit.x, this.fruit.y), 
+						this.snake),
+						"U",
+						this.fruit.Gen(),
+						this.score + 1
+				);
+				}
+			} else {
+				return this;
+			}
+		} else if (key.equals("down")) {
+			if (this.dir != "U") {
+				if (!(this.snake.moveDown().getFirst().sameCord(fruit))) {
+					return new SnakeGame(this.snake.moveDown(), "D", this.fruit, this.score);
+				} else {
+					this.score = this.score + 1;
+					return new SnakeGame(
+					new ConsLoPoSnake(
+						new PieceOfSnake(this.fruit.x, this.fruit.y), 
+						this.snake),
+						"D",
+						this.fruit.Gen(),
+						this.score + 1
+				);
+				}
+			} else {
+				return this;
+			}
 		} else if (key.equals("left")) {
-			return new SnakeGame(this.snake.moveLeft(), "L");
+			if (this.dir != "R") {
+				if (!(this.snake.moveLeft().getFirst().sameCord(fruit))) {
+					return new SnakeGame(this.snake.moveLeft(), "L", this.fruit, this.score);
+				} else {
+					this.score = this.score + 1;
+					return new SnakeGame(
+					new ConsLoPoSnake(
+						new PieceOfSnake(this.fruit.x, this.fruit.y), 
+						this.snake),
+						"L",
+						this.fruit.Gen(),
+						this.score + 1
+				);
+				}
+			} else {
+				return this;
+			}
 		} else if (key.equals("right")) {
-			return new SnakeGame(this.snake.moveRight(), "R");
+			if (this.dir != "L") {
+				if (!(this.snake.moveRight()).getFirst().sameCord(fruit)) {
+					return new SnakeGame(this.snake.moveRight(), "R", this.fruit, this.score);
+				} else {
+					this.score = this.score + 1;
+					return new SnakeGame(
+					new ConsLoPoSnake(
+						new PieceOfSnake(this.fruit.x, this.fruit.y), 
+						this.snake),
+						"R",
+						this.fruit.Gen(),
+						this.score + 1
+				);
+				}
+			} else {
+				return this;
+			}
 		} else {
 			return this;
 		}
 	}
 
 	public WorldScene makeScene(){
-		WorldScene scene = new WorldScene(this.WIDTH, this.HEIGHT);
-		return this.snake.drawOn(scene);
+		WorldScene scene0 = new WorldScene(this.WIDTH, this.HEIGHT);
+		WorldScene scene1 = this.snake.drawOn(scene0);
+		WorldScene scene2 = this.fruit.drawOn(scene1);
+		WorldImage scores =  new TextImage("Scores:" + String.valueOf(this.score), Color.BLACK);
+		return scene2.placeImageXY(scores, 35, 20);
 	}
 	public static void main(String[] args){
 		Tester.runReport(new Examples(), false, false);
-		SnakeGame game = new SnakeGame((new Examples()).l5, "D");
+		SnakeGame game = new SnakeGame((new Examples()).l5, "D", new Fruit(30, 30), 0);
 		game.bigBang(game.WIDTH, game.HEIGHT, 0.1);
 	}
 }
