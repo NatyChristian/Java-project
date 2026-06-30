@@ -11,18 +11,17 @@ class PieceOfSnake{
 		this.x = x;
 		this.y = y;
 	}
-
 	PieceOfSnake moveLeft(){
-		return new PieceOfSnake(this.x - 1, this.y);
+	    return new PieceOfSnake((((this.x - 2) % 50 + 50) % 50) + 1, this.y);
 	}
 	PieceOfSnake moveRight(){
-		return new PieceOfSnake(this.x + 1, this.y);
+	    return new PieceOfSnake((this.x % 50) + 1, this.y);
 	}
 	PieceOfSnake moveUp(){
-		return new PieceOfSnake(this.x, this.y - 1);
+	    return new PieceOfSnake(this.x, (((this.y - 2) % 50 + 50) % 50) + 1);
 	}
 	PieceOfSnake moveDown(){
-		return new PieceOfSnake(this.x, this.y + 1);
+	    return new PieceOfSnake(this.x, (this.y % 50) + 1);
 	}
 	WorldScene drawOn(WorldScene scene){
 		return scene.placeImageXY(
@@ -233,6 +232,6 @@ class SnakeGame extends World{
 	public static void main(String[] args){
 		Tester.runReport(new Examples(), false, false);
 		SnakeGame game = new SnakeGame((new Examples()).l5, "D");
-		game.bigBang(game.WIDTH, game.HEIGHT, 0.01);
+		game.bigBang(game.WIDTH, game.HEIGHT, 0.1);
 	}
 }
